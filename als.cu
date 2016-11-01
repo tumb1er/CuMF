@@ -305,7 +305,8 @@ get_hermitian100(const int batch_offset, float2* tt,
 					confSmem[threadIdx.x/2] = csrConfidence[anchor];
 					//IMPORTANT: for loop has constant and identical start and end
 					for (int k = 0; k < 50; k += 2)
-						thetaTemp[threadIdx.x*F/4 + k/2] =__ldg(&thetaT[ F/2 * col + threadIdx.x%2*F/4 + k/2]);
+						//thetaTemp[threadIdx.x*F/4 + k/2] =__ldg(&thetaT[ F/2 * col + threadIdx.x%2*F/4 + k/2]);
+						thetaTemp[threadIdx.x*F/4 + k/2] = thetaT[ F/2 * col + threadIdx.x%2*F/4 + k/2];
 				}
 			}
 //*/			
@@ -329,7 +330,7 @@ get_hermitian100(const int batch_offset, float2* tt,
 				}
 */
 			__syncthreads();
-
+///*
 			//tile: 10*10
 			if(threadIdx.x < 55){
 				if(iter < iterations - 1){
@@ -342,6 +343,7 @@ get_hermitian100(const int batch_offset, float2* tt,
 				}
 				
 			}
+//*/			
 		}
 		//end of iteration in copying from smem and aggregating in register
 		__syncthreads();
