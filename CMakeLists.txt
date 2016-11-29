@@ -5,11 +5,6 @@ project(CuFM)
 find_package(CUDA QUIET REQUIRED)
 
 set(
-        CUDA_HOST_COMPILER
-        /usr/bin/g++-4.9
-)
-
-set(
         CUDA_NVCC_FLAGS
         ${CUDA_NVCC_FLAGS}
         -Xcompiler -DADD_ -gencode arch=compute_35,code=sm_35 -gencode arch=compute_35,code=compute_35
@@ -33,13 +28,8 @@ cuda_add_executable(
         ${HU_O}
         ${MAIN_O}
 )
-
+cuda_add_cublas_to_target(main)
 target_link_libraries(
         main
-        -lcusparse
-        -lcublas
-)
-
-link_directories(
-        /usr/lib
+        ${CUDA_cusparse_LIBRARY}
 )
