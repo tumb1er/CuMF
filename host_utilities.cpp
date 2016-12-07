@@ -24,7 +24,7 @@ void loadCSRSparseMatrixBin(const char* dataFile, const char* rowFile, const cha
 	FILE *dFile = fopen(dataFile,"rb");
 	FILE *rFile = fopen(rowFile,"rb");
 	FILE *cFile = fopen(colFile,"rb");
-	if (!rFile||!dFile||!dFile)
+	if (!rFile||!dFile||!cFile)
 	{
 		printf("Unable to open file!");
 		return;
@@ -48,7 +48,7 @@ void loadCSCSparseMatrixBin(const char* dataFile, const char* rowFile, const cha
 	FILE *dFile = fopen(dataFile,"rb");
 	FILE *rFile = fopen(rowFile,"rb");
 	FILE *cFile = fopen(colFile,"rb");
-	if (!rFile||!dFile||!dFile)
+	if (!rFile||!dFile||!cFile)
 	{
 		printf("Unable to open file!");
 		return;
