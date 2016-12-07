@@ -57,6 +57,8 @@ typedef struct _als_files {
 
 } als_files;
 
+static const int ARGS_COUNT = 3;
+
 /// Разбирает аргументы командной строки для программы
 /// \param argc число аргументов
 /// \param argv массив указателей на входные параметры программы

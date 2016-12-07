@@ -6,7 +6,7 @@
 
 
 void print_usage(char *prog) {
-    printf("Usage: %s [options] <M> <N> <train_data_prefix> <X_output> <Theta_output>\n", prog);
+    printf("Usage: %s [options] <train_data_prefix> <X_output> <Theta_output>\n", prog);
     printf("Options:\n");
 
     printf("--test <prefix>\ttest data prefix\n");
@@ -18,8 +18,10 @@ void print_usage(char *prog) {
     exit(1);
 }
 
+
+
 quokka_als_args* parse_args(int argc, char **argv) {
-    char* pointers[6];
+    char* pointers[ARGS_COUNT];
     int c;
     int option_index = 0;
     int value = 0;
@@ -29,7 +31,9 @@ quokka_als_args* parse_args(int argc, char **argv) {
     args->factors = 100;
     args->iterations = 10;
     args->lambda = 0.3;
-    if (argc < 7) {
+    args->m = 0;
+    args->n = 0;
+    if (argc <= ARGS_COUNT) {
         print_usage(argv[0]);
         return NULL;
     }
@@ -47,7 +51,6 @@ quokka_als_args* parse_args(int argc, char **argv) {
         };
         c = getopt_long(argc, argv, "f:n:x:t:i:", long_options, &option_index);
         if (c == -1) break;
-
         switch(c) {
             case 'f':
                 value = atoi(optarg);
@@ -73,7 +76,7 @@ quokka_als_args* parse_args(int argc, char **argv) {
                 break;
             case 't':
                 value = atoi(optarg);
-                if (value <= 0 || value%10) {
+                if (value <= 0) {
                     print_usage(argv[0]);
                     return NULL;
                 }
@@ -81,7 +84,7 @@ quokka_als_args* parse_args(int argc, char **argv) {
                 break;
             case 'i':
                 value = atoi(optarg);
-                if (value <= 0 || value%10) {
+                if (value <= 0) {
                     print_usage(argv[0]);
                     return NULL;
                 }
@@ -93,33 +96,17 @@ quokka_als_args* parse_args(int argc, char **argv) {
     }
 
     option_index = 0;
-    while (optind < argc && option_index < 6) {
+    while (optind < argc && option_index < ARGS_COUNT) {
         pointers[option_index++] = argv[optind++];
 
     }
-    if (option_index < 6) {
+    if (option_index < ARGS_COUNT) {
         print_usage(argv[0]);
         return NULL;
     }
 
-    args->test_matrix_prefix = pointers[0];
-    args->train_matrix_prefix = pointers[1];
-    args->x_output = pointers[2];
-    args->t_output = pointers[3];
-
-    value = atoi(pointers[4]);
-    if (value <= 0) {
-        print_usage(argv[0]);
-        return NULL;
-    }
-    args->m = (unsigned int)value;
-
-    value = atoi(pointers[5]);
-    if (value <= 0) {
-        print_usage(argv[0]);
-        return NULL;
-    }
-    args->n = (unsigned int)value;
-
+    args->train_matrix_prefix = pointers[0];
+    args->x_output = pointers[1];
+    args->t_output = pointers[2];
     return args;
 }

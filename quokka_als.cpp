@@ -7,6 +7,7 @@
 #include <cuda_runtime_api.h>
 #include <cstdlib>
 #include <cstdio>
+#include <cstring>
 #include "utils/argparse.h"
 #include "als.h"
 #include "host_utilities.h"
@@ -86,19 +87,29 @@ void load_matrices(quokka_als_args* args, als_files* files, long nnz, long nnz_t
 }
 
 
+char* get_file_name(string prefix, const char *suffix) {
+    string fn = prefix + suffix;
+    char * result = (char*)malloc(fn.length() + 1);
+    strcpy (result, fn.c_str());
+    return result;
+}
+
+
 int main(int argc, char **argv) {
     quokka_als_args * args = parse_args(argc, argv);
     string train_prefix = string(args->train_matrix_prefix);
 
     als_files files;
+    files.train_coo_row = get_file_name(train_prefix, TRAIN_COO_ROW);
+    files.train_csr_data = get_file_name(train_prefix, TRAIN_CSR_DATA);
+    files.train_csr_indices = get_file_name(train_prefix, TRAIN_CSR_INDICES);
+    files.train_csr_indptr = get_file_name(train_prefix, TRAIN_CSR_INDPTR);
+    files.train_csc_data = get_file_name(train_prefix, TRAIN_CSC_DATA);
+    files.train_csc_indices = get_file_name(train_prefix, TRAIN_CSC_INDICES);
+    files.train_csc_indptr = get_file_name(train_prefix, TRAIN_CSC_INDPTR);
 
-    files.train_coo_row = (train_prefix + TRAIN_COO_ROW).c_str();
-    files.train_csr_data = (train_prefix + TRAIN_CSR_DATA).c_str();
-    files.train_csr_indices = (train_prefix + TRAIN_CSR_INDICES).c_str();
-    files.train_csr_indptr = (train_prefix + TRAIN_CSR_INDPTR).c_str();
-    files.train_csc_data = (train_prefix + TRAIN_CSC_DATA).c_str();
-    files.train_csc_indices = (train_prefix + TRAIN_CSC_INDICES).c_str();
-    files.train_csc_indptr = (train_prefix + TRAIN_CSC_INDPTR).c_str();
+    args->m = fileSize(files.train_csr_indptr) / sizeof(int) - 1;
+    args->n = fileSize(files.train_csc_indptr) / sizeof(int) - 1;
 
     long nnz = fileSize(files.train_csr_data) / sizeof(float);
     if (nnz != fileSize(files.train_csc_data) / sizeof(float)) {
@@ -111,12 +122,13 @@ int main(int argc, char **argv) {
     files.test_coo_col = NULL;
     if (args->test_matrix_prefix != NULL) {
         string test_prefix = string(args->test_matrix_prefix);
-        files.test_coo_data = (test_prefix + TEST_COO_DATA).c_str();
-        files.test_coo_row = (test_prefix + TEST_COO_ROW).c_str();
-        files.test_coo_col = (test_prefix + TEST_COO_COL).c_str();
+        files.test_coo_data = get_file_name(test_prefix, TEST_COO_DATA);
+        files.test_coo_row = get_file_name(test_prefix, TEST_COO_ROW);
+        files.test_coo_col = get_file_name(test_prefix, TEST_COO_COL);
         nnz_test = fileSize(files.test_coo_data) / sizeof(float);
     }
 
+    cout << "DEBUG: " << fileSize(files.test_coo_data) << endl;
     cout << "M: " << args->m << endl;
     cout << "N: " << args->n << endl;
     cout << "Factors: " << args->factors << endl;
