@@ -107,9 +107,10 @@ int main(int argc, char **argv) {
     files.train_csc_data = get_file_name(train_prefix, TRAIN_CSC_DATA);
     files.train_csc_indices = get_file_name(train_prefix, TRAIN_CSC_INDICES);
     files.train_csc_indptr = get_file_name(train_prefix, TRAIN_CSC_INDPTR);
-
-    args->m = fileSize(files.train_csr_indptr) / sizeof(int) - 1;
-    args->n = fileSize(files.train_csc_indptr) / sizeof(int) - 1;
+    if (args->m == 0)
+        args->m = fileSize(files.train_csr_indptr) / sizeof(int) - 1;
+    if (args->n == 0)
+        args->n = fileSize(files.train_csc_indptr) / sizeof(int) - 1;
 
     long nnz = fileSize(files.train_csr_data) / sizeof(float);
     if (nnz != fileSize(files.train_csc_data) / sizeof(float)) {
@@ -165,6 +166,18 @@ int main(int argc, char **argv) {
     cout << "Loading data to host..." << endl;
 
     load_matrices(args, &files, nnz, nnz_test);
+
+    cout << "Randomize initial X, Theta" << endl;
+
+    //initialize thetaT on host
+    unsigned int seed = 0;
+    srand (seed);
+    for (int k = 0; k < args->n * args->factors; k++)
+        thetaTHost[k] = (float) (0.1 * ((float) rand() / (float)RAND_MAX));
+    //CG needs to initialize X as well
+    for (int k = 0; k < args->m * args->factors; k++)
+        XTHost[k] = (float) (0.1 * ((float) rand() / (float)RAND_MAX));;
+
 
     cout << "Do ALS..." << endl;
 

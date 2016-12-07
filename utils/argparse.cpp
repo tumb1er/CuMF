@@ -13,6 +13,8 @@ void print_usage(char *prog) {
     printf("--factors <int>\tnumber of factors (multiple of 10, default 100)\n");
     printf("--xbatch <int>\tX batch count\n");
     printf("--tbatch <int>\tTheta batch count\n");
+    printf("--M <int>\trows count\n");
+    printf("--N <int>\tcolumns count\n");
     printf("--iterations <int>\tNumber of iterations\n");
     printf("--normalize <filename>\tnormalize input data and save coefficients to <filename>\n");
     exit(1);
@@ -44,21 +46,27 @@ quokka_als_args* parse_args(int argc, char **argv) {
                 {"factors", required_argument, 0,            'f'},
                 {"normalize", required_argument, 0,            'n'},
                 {"test", required_argument, 0,            'T'},
+                {"lambda", required_argument, 0,            'l'},
                 {"xbatch", required_argument, 0,            'x'},
                 {"tbatch", required_argument, 0,            't'},
+                {"M", required_argument, 0,            'M'},
+                {"N", required_argument, 0,            'N'},
                 {"iterations", required_argument, 0,            'i'},
                 {0, 0,                         0,            0}
         };
-        c = getopt_long(argc, argv, "f:n:x:t:i:", long_options, &option_index);
+        c = getopt_long(argc, argv, "f:l:n:x:t:i:M:N:", long_options, &option_index);
         if (c == -1) break;
         switch(c) {
             case 'f':
                 value = atoi(optarg);
-                if (value <= 0 || value%10) {
+                if (value <= 0 || value % 10) {
                     print_usage(argv[0]);
                     return NULL;
                 }
                 args->factors = (unsigned int) value;
+                break;
+            case 'l':
+                args->lambda = (float) atof(optarg);
                 break;
             case 'n':
                 args->mean_output = optarg;
@@ -81,6 +89,22 @@ quokka_als_args* parse_args(int argc, char **argv) {
                     return NULL;
                 }
                 args->t_batch = (unsigned int) value;
+                break;
+            case 'M':
+                value = atoi(optarg);
+                if (value <= 0) {
+                    print_usage(argv[0]);
+                    return NULL;
+                }
+                args->m = (unsigned int) value;
+                break;
+            case 'N':
+                value = atoi(optarg);
+                if (value <= 0) {
+                    print_usage(argv[0]);
+                    return NULL;
+                }
+                args->n = (unsigned int) value;
                 break;
             case 'i':
                 value = atoi(optarg);
