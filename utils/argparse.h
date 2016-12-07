@@ -24,8 +24,8 @@ typedef struct _quokka_als_args {
     unsigned int iterations; // number of iterations
 
     float lambda; // hyper-parameter
-    int x_batch;  // X batch size
-    int t_batch;  // Theta batch size
+    unsigned int x_batch;  // X batch size
+    unsigned int t_batch;  // Theta batch size
 
     // Test data: sparse matrix in COO format (x + y + value)
     char* test_matrix_prefix; // common prefix for files .test.data.bin, .test.row.bin, .test.col.bin
